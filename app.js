@@ -9,14 +9,12 @@ var app = new Framework7({
   id: 'io.Framework7.Bookshelf',
   root: '#app',
   theme: "auto",
+  pushState: true,
   routes: routes,
   on: {
     init: function () {
         console.log('App initialized');
         createLogin();
-    },
-    pageInit: function () {
-        console.log('Page initialized');
     },
   },
   panel: {
@@ -32,11 +30,10 @@ var mainView = app.views.create('.view-left', {
 var mainView = app.views.create('.view-main', {
   url: '/'
 });
-
 function createLogin(){
     login_screen = app.loginScreen.create({
     content:
-      '<div class="login-screen">'+
+    '<div class="login-screen">'+
     '<div class="view">'+
       '<div class="page">'+
         '<div class="page-content login-screen-content">'+
@@ -93,58 +90,59 @@ function createLogin(){
         on: {
         opened: function () {
             console.log('Login Screen opened')
-        }
+        },
         }
     });
 
-    login_screen.open(false);
-    checkLogin();
+login_screen.open(false);
+checkLogin();
 
 
-    $('.button-login').on('click', function (e) {
-        app.preloader.show();
-        var username = $("#username").val();
-        var password = $("#password").val();
-        if(username != '' && password !='' ){
-        app.request({
-            async: true, 
-            url: 'https://desolate-basin-69053.herokuapp.com/login',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify({
-                'username': username,
-                'password': password
-                    }),
-            type: "POST",
-            dataType: "json",
-            crossDomain: true,
-            headers: {'Authorization' : 'Basic ' + btoa(username + ':' + password)},
-        error: function (data) {
-          app.preloader.hide(); 
-          app.dialog.alert('Invalid username or password!', 'Login Error');
-        },
-
-        success: function (data)  {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('authorization', 'Basic' + btoa(username + ':' +password));
-            localStorage.setItem('username', username);
-            app.dialog.alert('Welcome ' + username, 'Login Success');
-            books();
-            app.preloader.hide();
-            app.loginScreen.close();
-        },
-
-        complete: function (jqXHR) {
-                      if (jqXHR.status == '401') {
-                          console.log(jqXHR.status)
-         }}
-
-    });
+$('.button-login').on('click', function (e) {
+    app.dialog.preloader();
+    var username = $("#username").val();
+    var password = $("#password").val();
+    if(username != '' && password !='' ){
+      app.request({
+        async: true, 
+        url: 'https://desolate-basin-69053.herokuapp.com/login',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({
+            'username': username,
+            'password': password
+                }),
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        headers: {'Authorization' : 'Basic ' + btoa(username + ':' + password)},
+      error: function (data) {
+        app.dialog.close();
+        app.dialog.alert('Invalid username or password!', 'Login Error');
+      },
+      success: function (data)  {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('authorization', 'Basic' + btoa(username + ':' +password));
+        localStorage.setItem('username', username);
+        app.dialog.alert('Welcome ' + username, 'Login Success');
+        recentadded();
+        toprated();
+        topborrow();
+        allbooks();
+/*        app.dialog.close();*/
+        app.loginScreen.close();
+      },
+      complete: function (jqXHR) {
+        if (jqXHR.status == '401') {
+            app.loginScreen.open();
+          }
         }
-        else{
-          app.preloader.hide(); 
-          app.dialog.alert('invalid username or password!', 'Login Error')
-        }
-    });  
+      });
+    }
+    else{
+      app.preloader.hide(); 
+      app.dialog.alert('invalid username or password!', 'Login Error')
+    }
+  });  
 }
 
 function checkLogin(){
@@ -153,11 +151,17 @@ function checkLogin(){
       token = localStorage.getItem("token");
   }
   if(token){
-  login_screen.close();
+    app.dialog.preloader();
+    recentadded();
+    toprated();
+    topborrow();
+    allbooks();
+    login_screen.close();
   }else{
-  login_screen.open();
+    login_screen.open();
   }
 }
+
 function searchCheck(that) {
       if (that.value == "isbn_") {
           console.log(that.value);
@@ -280,6 +284,72 @@ $$('.dynamic-popover').on('click', function () {
   dynamicPopover.open();
 });
 
+// function iconClick() {
+//   // var $$ = $.noConflict();
+//   $$('.rating').on('click', function() {
+//       $$("#rated5").html() === '<i id="" class="f7-icons">star_fill</i>' ? $$("#rated5").html('<i id="" class="f7-icons">star</i>') : $$("#rated5").html('<i id="" class="f7-icons color-yellow">star_fill</i>')
+      
+//       $$("#rated3").html() = '<i id="" class="f7-icons">star_fill</i>';
+//       $$("#rated2").html() = '<i id="" class="f7-icons">star_fill</i>';
+//       $$("#rated1").html() = '<i id="" class="f7-icons">star_fill</i>';
+//   })
+// }
+
+function iconClick1() {
+  document.getElementById("icon-click1").style.color = "yellow";
+  setInterval(function(){
+    document.getElementById("icon-click1").style.color = "black";
+  }, 3000)
+}
+
+function iconClick2() {
+  document.getElementById("icon-click1").style.color = "yellow";
+  document.getElementById("icon-click2").style.color = "yellow";
+  setInterval(function(){
+    document.getElementById("icon-click1").style.color = "black";
+    document.getElementById("icon-click2").style.color = "black";
+  }, 3000)
+}
+
+function iconClick3() {
+  document.getElementById("icon-click1").style.color = "yellow";
+  document.getElementById("icon-click2").style.color = "yellow";
+  document.getElementById("icon-click3").style.color = "yellow";
+  setInterval(function(){
+    document.getElementById("icon-click1").style.color = "black";
+    document.getElementById("icon-click2").style.color = "black";
+    document.getElementById("icon-click3").style.color = "black";
+  }, 3000)
+}
+
+function iconClick4() {
+  document.getElementById("icon-click1").style.color = "yellow";
+  document.getElementById("icon-click2").style.color = "yellow";
+  document.getElementById("icon-click3").style.color = "yellow";
+  document.getElementById("icon-click4").style.color = "yellow";
+  setInterval(function(){
+    document.getElementById("icon-click1").style.color = "black";
+    document.getElementById("icon-click2").style.color = "black";
+    document.getElementById("icon-click3").style.color = "black";
+    document.getElementById("icon-click4").style.color = "black";
+  }, 3000)
+}
+
+function iconClick5() {
+  document.getElementById("icon-click1").style.color = "yellow";
+  document.getElementById("icon-click2").style.color = "yellow";
+  document.getElementById("icon-click3").style.color = "yellow";
+  document.getElementById("icon-click4").style.color = "yellow";
+  document.getElementById("icon-click5").style.color = "yellow";
+  setInterval(function(){
+    document.getElementById("icon-click1").style.color = "black";
+    document.getElementById("icon-click2").style.color = "black";
+    document.getElementById("icon-click3").style.color = "black";
+    document.getElementById("icon-click4").style.color = "black";
+    document.getElementById("icon-click5").style.color = "black";
+  }, 3000)
+}
+
 
 // create searchbar
 var searchbar = app.searchbar.create({
@@ -292,55 +362,6 @@ var searchbar = app.searchbar.create({
     }
   }
 });
-
-//prompt
-
-function promptTest() {
-  app.dialog.prompt('<h5>'+'Step-by-step procedure:'+'</h5>'+
-  '<ol><h5><li>'+'Make contact with the owner of the book to discuss where to meet and when.'+'</li></h5>'+
-  '<h5><li>'+'Meet up with them'+'</li></h5>'+
-  '<h5><li>'+'When you receive the book, make sure they have given the verification code.'+'</h5></li>'+
-  '<h5 style="font-weight:bolder;"><li>'+'Enter the code given to you from the owner.'+'</li></h5></ol>', '<h4>' +'Enter the verification code given by the owner of the book:'+'</h4>', function (code) {
-    var tokens = localStorage.getItem('token');
-    var id = localStorage.getItem('bookid');
-    var owner = localStorage.getItem('bookowners');
-    var user = localStorage.getItem('username');
-
-    loops = [];
-
-    app.request({
-      url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/confirm',
-      method: "POST",
-      contentType: 'application/json; charset=utf-8',
-      headers: { 'x-access-token': tokens },
-      dataType: "json",
-      crossDomain: true,
-      data: JSON.stringify({
-        'book_id': id,
-        'book_borrower': user,
-        'book_owner': owner,
-        'code': code
-
-      }),
-      success: function (data) {
-        console.log(data);
-        if (data.message == "Code invalid" ){
-          app.dialog.alert('Code is invalid', "INVALID");
-        }else{
-          app.dialog.alert('Confirmed', "SUCCESS");
-          mainView.router.navigate(mainView.router.currentRoute.url,{
-            ignoreCache: true,
-            reloadCurrent: true
-          });
-        }
-      },
-      error: function (data) {
-        console.log(data);
-        console.log("error");
-      }
-    });
-  });
-}
 
 function signUp1() {
   document.getElementById("signUp1").style.display = "none";
@@ -365,6 +386,7 @@ function signUp4() {
 }
 
 function signup0(){
+        app.dialog.preloader();
         var fname = $("#first_name").val();
         var lname = $("#last_name").val();
         var contact_number = $("#contact_number").val();
@@ -390,11 +412,14 @@ function signup0(){
           dataType: "json",
           crossDomain: true,
           success: function(resp) {
-            console.log("success");
+            app.dialog.close()
+            console.log("Registered success");
             alert("Registered successfully!");
+            mainView.router.navigate('/');
             checkLogin();
           },
           error: function (e) {
+            app.dialog.close()
             alert(birthdate)
             console.log('error');
           }
@@ -422,23 +447,19 @@ function sik() {
   // selected1 = [];
 
   $("input:checkbox[name=select]:checked").each(function () {
-  localStorage.setItem("siked1",$(this).val());
-    
-    // selected.push();
+    localStorage.setItem("siked1", $(this).val());
   });
 
-  // for (var i = 0; i < selected.length; i++) {
-  //   var e = { 'method': selected[i] }
-  //   selected1.push(e);
-  // }
+  }
   // localStorage.setItem("siked1", JSON.stringify(selected));
-  // localStorage.setItem("siked", JSON.stringify(selected1));
-}
+//   localStorage.setItem("siked", JSON.stringify(selected1));
+// }
 
 
 
 function addbook()
   {
+  app.dialog.preloader();  
   var priceRent = '';
   var priceSale = '';
   if ($("#pricerate").val() == '') {
@@ -468,7 +489,6 @@ function addbook()
   var fiction = ['Adventure', 'Action', 'Drama', 'Horror', 'Mystery', 'Mythology'];
   var nonFiction = ['Biography', 'Essay', 'Journalism', 'Personal Narrative', 'Reference Book', 'Speech'];
   var academics = ['English', 'History', 'Math', 'Science'];
-  alert(tokens);
   var category = "";
   var genre1 = $("#genre").val();
   if (fiction.includes(genre1)) {
@@ -480,9 +500,7 @@ function addbook()
   }else {
     var category = "Educational";
   }
-
-
-    app.request({    
+    app.request({  
         async: true, 
         url: 'https://desolate-basin-69053.herokuapp.com/user/addbook',
         contentType: 'application/json; charset=utf-8',
@@ -491,8 +509,6 @@ function addbook()
         dataType: "json",
         crossDomain: true,
         data: JSON.stringify({
-            
-
           "isbn": isbn,
           "title": title,
           "publisher_name": publisher_name,
@@ -513,11 +529,21 @@ function addbook()
         success: function(data) {
         console.log(data);
         alert(title+ " book is added")
-        app.router.navigate('/');
+        recentadded();
+        toprated();
+        topborrow();
+        allbooks();
+        app.router.navigate('/', {
+          reloadCurrent:true,
+        });
         },
-        
         error: function (data) {
         console.log(data);
+        app.router.navigate('/', {
+          reloadCurrent:true,
+        });
+        },
+        complete: function(){
         }
     });
 }
@@ -601,35 +627,6 @@ loops = [];
   });
 }
 
-
-function visitviewbooks() {
-  var tokens = localStorage.getItem('token');
-  var username = localStorage.getItem('bookowners');
-  loops = [];
-  app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/user/bookshelf',
-    method: "POST",
-    contentType: 'application/json; charset=utf-8',
-    headers: { 'x-access-token': tokens },
-    dataType: "json",
-    crossDomain: true,
-    data: JSON.stringify({
-      'current_user': username
-    }),
-    success: function (data) {
-      console.log(data);
-      var employee_data = "";
-      for (var i = 0; i < data.book.length; i++) {
-        employee_data += '<div class="col-33" style="text-align:center;">';
-        employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-        employee_data += '<div class="container">' + data.book[i].title + '</div>';
-        employee_data += '</div>';
-      }
-      $('#allbook').append(employee_data);
-    }
-  });
-}
-
 function get_one(i) {
   localStorage.setItem('index', i);
 }
@@ -670,91 +667,17 @@ function bookowner(i) {
   localStorage.setItem('bookowners', i);
 }
 
-function borrow_return(){
-  var tokens = localStorage.getItem('token');
-  var user = localStorage.getItem('username');
-  var borrower = localStorage.getItem('borrower');
-  var id = localStorage.getItem('bookid');
-  app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/borrow_return',
-    contentType: 'application/json; charset=utf-8',
-    method: "POST",
-    dataType: "json",
-    crossDomain: true,
-    headers: { 'x-access-token': tokens },
-    data:JSON.stringify({
-      'book_id': id,
-      'borrower': borrower,
-      'owner': user
-    }),
-    success: function (data) {
-      console.log(data)
-    }, error: function (data) {
-      console.log(data);
-      console.log("gdgagsd");
-    }
-  });
-}
-function borrow_return_request() {
-  var tokens = localStorage.getItem('token');
-  var user = localStorage.getItem('username');
-  var borrower = localStorage.getItem('bookowners');
-  var id = localStorage.getItem('bookid');
-  app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/borrow_return_request',
-    contentType: 'application/json; charset=utf-8',
-    method: "POST",
-    dataType: "json",
-    crossDomain: true,
-    headers: { 'x-access-token': tokens },
-    data: JSON.stringify({
-      'book_id': id,
-      'borrower': user,
-      'owner': borrower
-    }),
-    success: function (data) {
-      console.log(data)
-    }, error: function (data) {
-      console.log(data);
-      console.log("gdgagsd");
-    }
-  });
-}
-function rent_return() {
-  var tokens = localStorage.getItem('token');
-  var user = localStorage.getItem('username');
-  var borrower = localStorage.getItem('borrower');
-  var id = localStorage.getItem('bookid');
-  app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/rent_return',
-    contentType: 'application/json; charset=utf-8',
-    method: "POST",
-    dataType: "json",
-    crossDomain: true,
-    headers: { 'x-access-token': tokens },
-    data: JSON.stringify({
-      'book_id': id,
-      'borrower': borrower,
-      'owner': user
-    }),
-    success: function (data) {
-      console.log(data);
-    },error:function(data) {
-      console.log(data);   
-      console.log("gdgagsd");   
-    }
-  });
-}
-
 function onebook() {
   var tokens = localStorage.getItem('token');
   var id = localStorage.getItem('bookid');
   var owner = localStorage.getItem('bookowners');
   var user = localStorage.getItem('username');
   var res = localStorage.getItem('checkfollow');
-  if((owner == 'null') || (owner == 'undefined')){
+  if (owner == 'null' || owner == 'undefined'){
     owner = localStorage.getItem('username');
-  }
+  } 
+  // console.log("dhdhdhdh");  
+  // console.log(b);
   loops = [];
   
   app.request({
@@ -771,98 +694,122 @@ function onebook() {
 
     }),
     success: function (data) {
-      console.log(data);
-      console.log(data.book[0].borrower + "asdasdasd");
-      var title = "";
-      var cover = "";
-      var owner = "";
-      var method = "";
-      if (data.book[0].check == "Borrowed"){
-      var borrower = data.book[0].borrower;
-        localStorage.setItem('borrower', borrower);
-      } else if (data.book[0].check == "Rented"){
-        var total = data.book[0].total
-        var borrower = data.book[0].borrower;
-        localStorage.setItem('borrower', borrower);
-        localStorage.setItem('total', total);
-      }
-       title += '<div class="demo-facebook-name">' + data.book[0].title;
-        title += '<a href="#" class="link" style="float: right !important;">';
-        title += '<i class="icon material-icons md-only size-100">bookmark_border</i>';
-        title += '</a>';
-        title += '</div>';
+            console.log(data);
+            console.log(data.book[0].borrower + "asdasdasd");;
+            var title = "";
+            var cover = "";
+            var owner = "";
+            var method = "";
+            var star = "";
+            var starRate = data.book[0].totalRate
+            if (data.book[0].check == "Borrowed"){
+            var borrower = data.book[0].borrower;
+              localStorage.setItem('borrower', borrower);
+            } else if (data.book[0].check == "Rented"){
+              var total = data.book[0].total
+              var borrower = data.book[0].borrower;
+              localStorage.setItem('borrower', borrower);
+              localStorage.setItem('total', total);
+            }
+             title += '<div class="demo-facebook-name">' + data.book[0].title;
+              title += '<a href="#" class="link" style="float: right !important;">';
+              title += '<i class="icon material-icons md-only size-100">bookmark_border</i>';
+              title += '</a>';
+              title += '</div>';
 
-      $('#title').append(title);
+            $('#title').append(title);
 
-      cover += '<img src="' + data.book[0].book_cover + '"width="80%" height="75%"/ class="row center">';
-      cover += '<br>' + data.book[0].author_name;
-      if ((data.book[0].check == "Borrowed") && (data.book[0].username == user)){
-        cover += '<h3>This book is currently borrowed by ' + data.book[0].borrower_fname + ' ' + data.book[0].borrower_lname+'.</h3>';
-        cover += '<button onclick="borrow_return();">' + 'Confirm' +'</button>';
-        // borrow_return
-      } else if ((data.book[0].check == "Borrowed") && (user == borrower)){
-        cover += '<h3>Please confirm if you have returned this book to the owner.</h3>';
-        cover += '<button onclick="borrow_return_request();">' + 'Confirm' +'</button>';
-        // borrow_return_request
-      } else if ((data.book[0].check == "Rented") && (data.book[0].username == user)) {
-        cover += '<h3>This book is currently rented by ' + data.book[0].borrower_fname + ' ' + data.book[0].borrower_lname + '.</h3>';
-        cover += '<h4>Please confirm if this book has been returned.</h4>';
-        cover += '<button onclick="rent_return();">' + 'Confirm' +'</button>';
-        // rent_return
-      } else if ((data.book[0].check == "Rented") && (user == borrower)) {
-        cover += '<h4>Prepare an amount of ' + data.book[0].total + 'php for the payment of rent.'+'</h4>';
-        cover += '<h5>Please confirm if you have returned this book to the owner.</h5>';
-        cover += '<button onclick="borrow_return_request();">'+'Confirm'+'</button>';
-        // borrow_return_request
-      }else{
-        if (data.book[0].price != 0  ){
-          cover += '<p class="likes">For Sale</p>';
-          cover += '<p class="likes">Price:' + data.book[0].price +"php"+ '</p>';
-        } else if (data.book[0].price_rate != 0){
-          cover += '<p class="likes">For Rent</p>';
-          cover += '<p class="likes">Price rate:' + data.book[0].price_rate + "php/day" + '</p>';
-        }else{
-          cover += '<p class="likes">For Borrow</p>';
-        }
-        cover += '<p class="likes">Rating:' + data.book[0].totalRate+'</p>';
-      }
-     $('#cover').append(cover);
-
-      owner += data.book[0].owner;
-      $('#owner').append(owner);
-
-
-      if (data.book[0].username == user){
-        method += ""
-        $('#method').append(method);
-      }else{
-        method += '<a onclick="viewprofile(); visitviewbooks();" href="/viewprofile/" class="color-blue alert-reply">profile</a>';
-        if (data.book[0].methods == "For Borrow"){
-          method += '<a class="link popover-open color-blue" data-popover=".popover-borrow">' + data.book[0].methods + '</a>';
-        } else if (data.book[0].methods == "For Rent"){
-          method += '<a onclick="price(\'' + data.book[0].price_rate + '\')" class="link popover-open color-blue" data-popover=".popover-rent">' + data.book[0].methods + '</a>';
-        }else{
-          method += '<a onclick="price(\'' + data.book[0].price + '\');sale();" class="color-blue alert-forward">' + data.book[0].methods + '</a>';
-        }
-        
-        console.log(res)
-        if (res == "Following"){
-          method += '<a onclick="#" class="color-red alert-forward" style="margin-right: 0.5em;">';
-          // method += '<i class="f7-icons">add</i>';
-          method += 'Unfollow';
-          method += '</a>';  
-        }else{        
-        method += '<a onclick="follow()" class="color-blue alert-forward" style="margin-right: 0.5em;">';
-        method += '<i class="f7-icons">add</i>';
-        method += 'Follow';
-        method += '</a>';
+            cover += '<img src="' + data.book[0].book_cover + '"width="80%" height="75%"/ class="row center">';
+            cover += '<br>' + data.book[0].author_name;
+            if ((data.book[0].check == "Borrowed") && (data.book[0].username == user)){
+              cover += '<h3>This book is currently borrowed by ' + data.book[0].borrower_fname + ' ' + data.book[0].borrower_lname+'.</h3>';
+              cover += '<button onclick="borrow_return();">' + 'Confirm' +'</button>';
+              // borrow_return
+            } else if ((data.book[0].check == "Borrowed") && (user == borrower)){
+              cover += '<h3>Please confirm if you have returned this book to the owner.</h3>';
+              cover += '<button onclick="borrow_return_request();">' + 'Confirm' +'</button>';
+              // borrow_return_request
+            } else if ((data.book[0].check == "Rented") && (data.book[0].username == user)) {
+              cover += '<h3>This book is currently rented by ' + data.book[0].borrower_fname + ' ' + data.book[0].borrower_lname + '.</h3>';
+              cover += '<h4>Please confirm if this book has been returned.</h4>';
+              cover += '<button onclick="rent_return();">' + 'Confirm' +'</button>';
+              // rent_return
+            } else if ((data.book[0].check == "Rented") && (user == borrower)) {
+              cover += '<h4>Prepare an amount of ' + data.book[0].total + 'php for the payment of rent.'+'</h4>';
+              cover += '<h5>Please confirm if you have returned this book to the owner.</h5>';
+              cover += '<button onclick="borrow_return_request();">'+'Confirm'+'</button>';
+              // borrow_return_request
+            }else{
+              if (data.book[0].price != 0  ){
+                cover += '<p class="likes">For Sale</p>';
+                cover += '<p class="likes">Price:' + data.book[0].price +"php"+ '</p>';
+              } else if (data.book[0].price_rate != 0){
+                cover += '<p class="likes">For Rent</p>';
+                cover += '<p class="likes">Price rate:' + data.book[0].price_rate + "php/day" + '</p>';
+              }else{
+                cover += '<p class="likes">For Borrow</p>';
+              }
+              for(var i = 0; i != 5; i++) {
+        if (starRate >= 1 ) {
+          star += '<i class="f7-icons color-yellow">star_fill</i>' + " ";
+        } else if (starRate < 1 && starRate > 0) {
+            star += '<i class="f7-icons color-yellow">star_half</i>' + " ";
+        } else if (starRate == 0){
+            star += '<i class="f7-icons">star</i>' + " ";
         }
 
-        $('#method').append(method);
+          
+        if (starRate < 1 && starRate > 0) {
+          starRate = 0;
+        } else if (starRate != 0){
+          starRate = starRate - 1;
+        }
       }
+
+
+      cover += '<p class="likes">Rater Count:' + " " + star + " " + "(" + data.book[0].numofRates + ")" + '</p>';
+            }
+           $('#cover').append(cover);
+
+            owner += data.book[0].owner;
+            $('#owner').append(owner);
+
+
+            if (data.book[0].username == user){
+              method += ""
+              $('#method').append(method);
+            }else{
+              method += '<a href="/viewprofile/" class="color-blue alert-reply">profile</a>';
+              if (data.book[0].methods == "For Borrow"){
+                method += '<a class="link popover-open color-blue" data-popover=".popover-borrow">' + data.book[0].methods + '</a>';
+              } else if (data.book[0].methods == "For Rent"){
+                method += '<a onclick="price(\'' + data.book[0].price_rate + '\')" class="link popover-open color-blue" data-popover=".popover-rent">' + data.book[0].methods + '</a>';
+              }else{
+                method += '<a onclick="price(\'' + data.book[0].price + '\');sale();" class="color-blue alert-forward">' + data.book[0].methods + '</a>';
+              }
+              
+              console.log(res)
+              if (res == "Following"){
+                method += '<a onclick="#" class="color-red alert-forward" style="margin-right: 0.5em;">';
+                // method += '<i class="f7-icons">add</i>';
+                method += 'Unfollow';
+                method += '</a>';  
+              }else{        
+              method += '<a onclick="follow()" class="color-blue alert-forward" style="margin-right: 0.5em;">';
+              method += '<i class="f7-icons">add</i>';
+              method += 'Follow';
+              method += '</a>';
+              }
+
+              $('#method').append(method);
+      }
+    },
+    complete: function(){
+      app.dialog.close();
     }
   });
 }
+
 function price(i) {
   localStorage.setItem('price', i);
 }
@@ -888,9 +835,13 @@ function checkfollow() {
     },
     error: function (data) {
       console.log(data);
+    },
+    complete: function (){
+      
     }
   })
 }
+
 function borrow() {
   var tokens = localStorage.getItem('token')
   var owner = localStorage.getItem('bookowners');
@@ -985,12 +936,13 @@ function sale() {
     }
   })
 }
+
 function english() {
   var tokens = localStorage.getItem('token');
   var genre_name = "English"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1000,53 +952,28 @@ function english() {
       console.log(data);
       var employee_data = "";
       for (var i = 0; i < data.book.length; i++) {
-
-        employee_data += '<div class="col-33" style="text-align:center;">';
-        employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-        employee_data += '<div class="container">' + data.book[i].title + '</div>';
-       employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
       }
       $('#english1').append(employee_data);
     }
   });
 }
 
-function Science() {
-  var tokens = localStorage.getItem('token');
-  var genre_name = "Science"
-  loops = [];
-  app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
-    method: "GET",
-    contentType: 'application/json; charset=utf-8',
-    headers: { 'x-access-token': tokens },
-    dataType: "json",
-    crossDomain: true,
-    success: function (data) {
-      console.log(data);
-      if (data.book.length == 0){
-        app.dialog.alert('Sorry, nothing to display');
-      }else{
-      var employee_data = "";
-      for (var i = 0; i < data.book.length; i++) {
-
-        employee_data += '<div class="col-33" style="text-align:center;">';
-        employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-        employee_data += '<div class="container">' + data.book[i].title + '</div>';
-        employee_data += '</div>';
-      }
-        $('#Science').append(employee_data);
-    }
-    }
-  });
-}
 
 function math() {
   var tokens = localStorage.getItem('token');
   var genre_name = "Math"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1059,11 +986,15 @@ function math() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#math').append(employee_data);
       }
@@ -1075,7 +1006,7 @@ function history() {
   var genre_name = "History"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1088,11 +1019,15 @@ function history() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#history').append(employee_data);
       }
@@ -1104,7 +1039,7 @@ function Adventure() {
   var genre_name = "Adventure"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1117,11 +1052,15 @@ function Adventure() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#Adventure').append(employee_data);
       }
@@ -1133,7 +1072,7 @@ function Action() {
   var genre_name = "Action"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1146,11 +1085,15 @@ function Action() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#Action').append(employee_data);
       }
@@ -1162,7 +1105,7 @@ function Drama() {
   var genre_name = "Drama"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1175,11 +1118,15 @@ function Drama() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#Drama').append(employee_data);
       }
@@ -1191,7 +1138,7 @@ function Horror() {
   var genre_name = "Horror"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1204,11 +1151,15 @@ function Horror() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#Horror').append(employee_data);
       }
@@ -1220,7 +1171,7 @@ function Mystery() {
   var genre_name = "Mystery"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1233,11 +1184,15 @@ function Mystery() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#Mystery').append(employee_data);
       }
@@ -1249,7 +1204,7 @@ function Mythology() {
   var genre_name = "Mythology"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1262,11 +1217,15 @@ function Mythology() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#Mythology').append(employee_data);
       }
@@ -1278,7 +1237,7 @@ function Biography() {
   var genre_name = "Biography"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1291,11 +1250,15 @@ function Biography() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#biography').append(employee_data);
       }
@@ -1307,7 +1270,7 @@ function essay() {
   var genre_name = "Essay"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1320,11 +1283,15 @@ function essay() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#essay').append(employee_data);
       }
@@ -1336,7 +1303,7 @@ function journalism() {
   var genre_name = "Journalism"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1349,11 +1316,15 @@ function journalism() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#journalism').append(employee_data);
       }
@@ -1365,7 +1336,7 @@ function personalnarrative() {
   var genre_name = "Personal Narrative"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1378,11 +1349,15 @@ function personalnarrative() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#Personalnarrative').append(employee_data);
       }
@@ -1394,7 +1369,7 @@ function referencebook() {
   var genre_name = "Reference Book"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1407,11 +1382,15 @@ function referencebook() {
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');checkfollow();comment();onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#referencebook').append(employee_data);
       }
@@ -1423,7 +1402,7 @@ function speech(){
   var genre_name = "Speech"
   loops = [];
   app.request({
-    url: 'https://desolate-basin-69053.herokuapp.com/mobile/interests/view2/' + genre_name,
+    url: 'https://desolate-basin-69053.herokuapp.com/interests/view2/' + genre_name,
     method: "GET",
     contentType: 'application/json; charset=utf-8',
     headers: { 'x-access-token': tokens },
@@ -1436,11 +1415,15 @@ function speech(){
       } else {
         var employee_data = "";
         for (var i = 0; i < data.book.length; i++) {
-
-          employee_data += '<div class="col-33" style="text-align:center;">';
-          employee_data += '<a href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\'); onebook();">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
-          employee_data += '<div class="container">' + data.book[i].title + '</div>';
-          employee_data += '</div>';
+        employee_data += '<li>';
+        employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+        employee_data += '<div class="item-media">';
+        employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+        employee_data += '</div>';
+        employee_data += '<div class="item-inner">';
+        employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+        employee_data += '</a></li>';
         }
         $('#speech').append(employee_data);
       }
@@ -1450,8 +1433,8 @@ function speech(){
 function search2(that) {
   var tokens = localStorage.getItem('token');
   // var username = localStorage.getItem('username');
-  var dv = that.value;
-  console.log(dv);
+  // var dv = that.value;
+  // console.log(dv);
   loops = [];
   app.request({
     url: 'https://desolate-basin-69053.herokuapp.com/search',
@@ -1467,29 +1450,360 @@ function search2(that) {
     }),
     success: function (data) {
       console.log(data);
-      if (data.book.length == 0) {
-        app.dialog.alert('Sorry, nothing to display');
-      } else {
-        var employee_data = "";
-        for (var i = 0; i < data.book.length; i++) {
+      // if (data.book.length == 0) {
+      //   app.dialog.alert('Sorry, nothing to display');
+      // } else {
+      //   var employee_data = "";
+      //   for (var i = 0; i < data.book.length; i++) {
 
-          employee_data += '<li class="item-content">';
-          employee_data += '<div class="item-inner">';
-          employee_data += '<div class="item-title">' + data.book[i].title +'</div>';
-          employee_data += '</div>';
-          employee_data += '</li>';
-        }
-        $('#books').append(employee_data);
-      }
+      //     employee_data += '<li class="item-content">';
+      //     employee_data += '<div class="item-inner">';
+      //     employee_data += '<div class="item-title">' + data.book[i].title +'</div>';
+      //     employee_data += '</div>';
+      //     employee_data += '</li>';
+      //   }
+      //   $('#books').append(employee_data);
+      // }
     }
   });
 }
 
+function recentadded() {
+  console.log('recentadded')
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/books/recent',
+    method: "GET",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    success: function (data) {
+      console.log(data);
+      var employee_data = "";
+      var i = "";
+      for (i = 0; i < data.book.length; i++) {
+        employee_data += '<div class="swiper-slide">';
+        employee_data += '<a onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');  " href="/item/">';
+        employee_data += '<img alt="'+data.book[i].title+'" src="' + data.book[i].book_cover + '">' + '</a>';
+        employee_data += '</div>';
+      }
+      $('#new').append(employee_data);
+    }
+  });
+}
+
+function topborrow() {
+  console.log('topborrow')
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/books/latest',
+    method: "GET",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    success: function (data) {
+      console.log(data);
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+        employee_data += '<div class="swiper-slide">';
+        employee_data += '<a onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\'); " href="/item/">';
+        employee_data += '<img alt="'+data.book[i].title+'" src="' + data.book[i].book_cover + '">' + '</a>';
+        employee_data += '</div>';
+      }
+      $('#borrow').append(employee_data);
+    }
+  });
+}
+
+function toprated() {
+  console.log('toprated')
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/books/toprated',
+    method: "GET",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    success: function (data) {
+      console.log(data);
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+        employee_data += '<div class="swiper-slide">';
+        employee_data += '<a onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');" href="/item/">';
+        employee_data += '<img alt="'+data.book[i].title+'" src="' + data.book[i].book_cover + '">' + '</a>';
+        employee_data += '</div>';
+      }
+      $('#rated').append(employee_data);
+    },
+      complete: function (jqXHR) {
+        if (jqXHR.status == '401') {
+            app.loginScreen.open();
+          }
+        }
+  });
+}
+
+function allbooks() {
+  console.log('allbooks')
+  var tokens = localStorage.getItem('token');
+  var username = localStorage.getItem('username');
+  loops = [];
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/user/bookshelf',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'current_user': username
+    }),
+    success: function (data) {
+      console.log(data);
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+        employee_data += '<div class="col-33" style="text-align:center;">';
+        employee_data += '<div class="elevation-20">';
+        employee_data += '<a href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">' + '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">' + '</a>';
+        employee_data += '<div class="container">' + data.book[i].title + '</div>';
+        employee_data += '</div></div>';
+      }
+      $('#allbook').append(employee_data);
+    },
+    complete: function(){
+      sliders();
+      app.dialog.close();
+    }
+  });
+}
+
+function searchall(){
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+  url: 'https://desolate-basin-69053.herokuapp.com/mobile/bookshelf/books',
+  method: "GET",
+  contentType: 'application/json; charset=utf-8',
+  headers: { 'x-access-token': tokens },
+  dataType: "json",
+  crossDomain: true,
+  success: function (data) {
+    console.log(data);
+    if (data.book.length == 0) {
+      app.dialog.alert('Sorry, nothing to display');
+    } else {
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+      employee_data += '<li>';
+      employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+      employee_data += '<div class="item-media">';
+      employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+      employee_data += '</div>';
+      employee_data += '<div class="item-inner">';
+      employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+      employee_data += '</div>';
+      employee_data += '</a></li>';
+      }
+      $('#allbooks').append(employee_data);
+    }
+  },
+  complete: function(){
+    app.dialog.close();
+  }
+});
+}
+
+
+function alltoprated(){
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+  url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/books/alltoprated',
+  method: "GET",
+  contentType: 'application/json; charset=utf-8',
+  headers: { 'x-access-token': tokens },
+  dataType: "json",
+  crossDomain: true,
+  success: function (data) {
+    console.log(data);
+    if (data.book.length == 0) {
+      app.dialog.alert('Sorry, nothing to display');
+    } else {
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+      employee_data += '<li>';
+      employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+      employee_data += '<div class="item-media">';
+      employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+      employee_data += '</div>';
+      employee_data += '<div class="item-inner">';
+      employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+      employee_data += '</div>';
+      employee_data += '</a></li>';
+      }
+      $('#alltoprated').append(employee_data);
+    }
+  },
+  complete: function(){
+    app.dialog.close();
+  }
+});
+}
+
+function alltoprated(){
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+  url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/books/alltoprated',
+  method: "GET",
+  contentType: 'application/json; charset=utf-8',
+  headers: { 'x-access-token': tokens },
+  dataType: "json",
+  crossDomain: true,
+  success: function (data) {
+    console.log(data);
+    if (data.book.length == 0) {
+      app.dialog.alert('Sorry, nothing to display');
+    } else {
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+      employee_data += '<li>';
+      employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+      employee_data += '<div class="item-media">';
+      employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+      employee_data += '</div>';
+      employee_data += '<div class="item-inner">';
+      employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+      employee_data += '</div>';
+      employee_data += '</a></li>';
+      }
+      $('#alltoprated').append(employee_data);
+    }
+  },
+  complete: function(){
+    app.dialog.close();
+  }
+});
+}
+
+function alllatestedition(){
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+  url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/books/alllatest',
+  method: "GET",
+  contentType: 'application/json; charset=utf-8',
+  headers: { 'x-access-token': tokens },
+  dataType: "json",
+  crossDomain: true,
+  success: function (data) {
+    console.log(data);
+    if (data.book.length == 0) {
+      app.dialog.alert('Sorry, nothing to display');
+    } else {
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+      employee_data += '<li>';
+      employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+      employee_data += '<div class="item-media">';
+      employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+      employee_data += '</div>';
+      employee_data += '<div class="item-inner">';
+      employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+      employee_data += '</div>';
+      employee_data += '</a></li>';
+      }
+      $('#alllatestedition').append(employee_data);
+    }
+  },
+  complete: function(){
+    app.dialog.close();
+  }
+});
+}
+
+function allrecentlyadded(){
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+  url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/books/allrecent',
+  method: "GET",
+  contentType: 'application/json; charset=utf-8',
+  headers: { 'x-access-token': tokens },
+  dataType: "json",
+  crossDomain: true,
+  success: function (data) {
+    console.log(data);
+    if (data.book.length == 0) {
+      app.dialog.alert('Sorry, nothing to display');
+    } else {
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+      employee_data += '<li>';
+      employee_data += '<a  class="item-link item-content" href="/item/" onclick="bookindex(\'' + data.book[i].book_id + '\'); bookowner(\'' + data.book[i].owner_username + '\');">';
+      employee_data += '<div class="item-media">';
+      employee_data += '<img src="' + data.book[i].book_cover + '" width="100px" height="150px">';
+      employee_data += '</div>';
+      employee_data += '<div class="item-inner">';
+      employee_data += '<div class="item-title">' + data.book[i].title + '</div>';
+      employee_data += '</div>';
+      employee_data += '</a></li>';
+      }
+      $('#allrecentlyadded').append(employee_data);
+    }
+  },
+  complete: function(){
+    app.dialog.close();
+  }
+});
+}
+
+function sliders(){
+  var mySwiper3 = app.swiper.create('.swiper-3', {
+    pagination:'.swiper-3 .swiper-pagination',
+    spaceBetween: 80,
+    slidesPerView: 3,
+    observer: true,
+    touchMoveStopPropagation: false,
+    paginationHide: false,
+    paginationClickable: false
+  });
+    var mySwiper2 = app.swiper.create('.swiper-2', {
+    pagination:'.swiper-2 .swiper-pagination',
+    spaceBetween: 80,
+    slidesPerView: 3,
+    observer: true,
+    touchMoveStopPropagation: false,
+    paginationHide: false,
+    paginationClickable: false
+  });
+  var mySwiper1 = app.swiper.create('.swiper-1', {
+    pagination:'.swiper-3 .swiper-pagination',
+    spaceBetween: 80,
+    slidesPerView: 3,
+    observer: true,
+    touchMoveStopPropagation: false,
+    paginationHide: false,
+    paginationClickable: false
+  });
+  app.dialog.close();
+}
+
+$('.tabs').on('show', function(){
+  $(this).find('.swiper-container')[0].swiper.update()
+});
+
 function follow() {
+  app.dialog.preloader();
   var tokens = localStorage.getItem('token');
   var owner = localStorage.getItem('bookowners');
   var user = localStorage.getItem('username');
-  
   loops = [];
   app.request({
     url: 'https://desolate-basin-69053.herokuapp.com/follow',
@@ -1509,16 +1823,21 @@ function follow() {
     },
     error: function (data) {
       console.log(data);
+    },
+    complete: function(data){
+      mainView.router.navigate(mainView.router.currentRoute.url, {
+      ignoreCache  : true,
+      reloadCurrent : true    
+  });
+      app.dialog.close();
     }
-    
   });
 }
+
 function viewprofile() {
   var tokens = localStorage.getItem('token');
   var username = localStorage.getItem('bookowners');
-
   loops = [];
-  
   app.request({
     url: 'https://desolate-basin-69053.herokuapp.com/user/info/' + username,
     method: "GET",
@@ -1551,6 +1870,9 @@ function viewprofile() {
 
   });
 }
+
+
+// <-- code from brex -->
 function displayComment() {
   var tokens = localStorage.getItem('token')
   var owner = localStorage.getItem('bookowners');
@@ -1588,10 +1910,14 @@ function displayComment() {
     },
     error: function (data) {
       console.log(data);
+    },
+    complete: function(data){
+      app.dialog.close();
     }
-  })
+  });
 }
 function comment() {
+  app.dialog.preloader();
   var tokens = localStorage.getItem('token');
   var user = localStorage.getItem('username');
   var bookowner = localStorage.getItem('bookowners');
@@ -1613,13 +1939,286 @@ function comment() {
     }),
     success: function (data) {
       console.log(data);
+      console.log('sulod sa success sa add comment');
+
     },
     error: function (data) {
       console.log(data);
+            console.log('sulod sa success sa add comment');
+      mainView.router.navigate(mainView.router.currentRoute.url, {
+      ignoreCache  : true,
+      reloadCurrent : true    
+  });
     }
-  
   })
 }
+
+function rateThis1() {
+  var tokens = localStorage.getItem('token');
+  var bookowner = localStorage.getItem('bookowners');
+  var bookid = localStorage.getItem('bookid');
+  var user = localStorage.getItem('username');
+  var rating = $('#thisRate1').val();
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/rate-book',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'username': user,
+      'owner':  bookowner,
+      'ratings': rating,
+      'book_id': bookid
+    }),
+    success: function (data) {
+      console.log('rate for 1 star');
+      alert("RATED!");
+
+    },
+    error: function (data) {
+      console.log(rating);
+      app.dialog.alert('Invalid username or password!', 'Login Error');
+      console.log(data);
+          mainView.router.navigate(mainView.router.currentRoute.url, {
+          ignoreCache  : true,
+          reloadCurrent : true
+          
+      });
+    }
+  });  
+}
+
+function rateThis2() {
+  var tokens = localStorage.getItem('token');
+  var bookowner = localStorage.getItem('bookowners');
+  var bookid = localStorage.getItem('bookid');
+  var user = localStorage.getItem('username');
+  var rating = $('#thisRate2').val();
+  console.log(rating)
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/rate-book',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'username': user,
+      'owner':  bookowner,
+      'ratings': rating,
+      'book_id': bookid
+    }),
+    success: function (data) {
+      console.log(data);
+      alert("RATED!");
+    },
+    error: function (data) {
+      console.log(rating);
+      console.log(data);
+          mainView.router.navigate(mainView.router.currentRoute.url, {
+          ignoreCache  : true,
+          reloadCurrent : true
+          
+      });
+    }
+  })  
+}
+
+function rateThis3() {
+  var tokens = localStorage.getItem('token');
+  var bookowner = localStorage.getItem('bookowners');
+  var bookid = localStorage.getItem('bookid');
+  var user = localStorage.getItem('username');
+  var rating = $('#thisRate3').val();
+  console.log(rating)
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/rate-book',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'username': user,
+      'owner':  bookowner,
+      'ratings': rating,
+      'book_id': bookid
+    }),
+    success: function (data) {
+      console.log(data);
+      alert("RATED!");
+    },
+    error: function (data) {
+      console.log(rating);
+      console.log(data);
+          mainView.router.navigate(mainView.router.currentRoute.url, {
+          ignoreCache  : true,
+          reloadCurrent : true
+          
+      });
+    }
+  })  
+}
+
+function rateThis4() {
+  var tokens = localStorage.getItem('token');
+  var bookowner = localStorage.getItem('bookowners');
+  var bookid = localStorage.getItem('bookid');
+  var user = localStorage.getItem('username');
+  var rating = $('#thisRate4').val();
+  
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/rate-book',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'username': user,
+      'owner':  bookowner,
+      'ratings': rating,
+      'book_id': bookid
+    }),
+    success: function (data) {
+      console.log(data);
+      alert("RATED!");
+    },
+    error: function (data) {
+      console.log(rating);
+      console.log(data);
+          mainView.router.navigate(mainView.router.currentRoute.url, {
+          ignoreCache  : true,
+          reloadCurrent : true
+          
+      });
+    }
+  })  
+}
+
+function rateThis5() {
+  var tokens = localStorage.getItem('token');
+  var bookowner = localStorage.getItem('bookowners');
+  var bookid = localStorage.getItem('bookid');
+  var user = localStorage.getItem('username');
+  var rating = $('#thisRate5').val();
+  console.log(rating)
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/rate-book',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'username': user,
+      'owner':  bookowner,
+      'ratings': rating,
+      'book_id': bookid
+    }),
+    success: function (data) {
+      console.log(data);
+      alert("RATED!");
+    },
+    error: function (data) {
+      console.log(rating);
+      console.log(data);
+          mainView.router.navigate(mainView.router.currentRoute.url, {
+          ignoreCache  : true,
+          reloadCurrent : true
+          
+      });
+    }
+  })  
+}
+
+// Joms codes
+
+function commentuser() {
+  app.dialog.preloader();
+  var tokens = localStorage.getItem('token');
+  var user = localStorage.getItem('username');
+  var bookowner = localStorage.getItem('bookowners');
+  var comment = $('#myComment').val();
+  console.log(comment)
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/comment/user',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'current_user': user,
+      'username':  bookowner,
+      'comment': comment,
+    }),
+    success: function (data) {
+      console.log(data);
+      console.log('sulod sa success sa add comment');
+
+    },
+    error: function (data) {
+      console.log(data);
+      console.log('finish na');
+      mainView.router.navigate(mainView.router.currentRoute.url, {
+      ignoreCache  : true,
+      reloadCurrent : true   
+  });
+    app.dialog.close();
+    }
+  })
+}
+
+
+  function displayCommentuser() {
+  var username = localStorage.getItem('username');
+    var tokens = localStorage.getItem('token')
+    var owner = localStorage.getItem('bookowners');
+  
+    app.request({
+      url: 'https://desolate-basin-69053.herokuapp.com/user/comments',
+      method: "POST",
+      contentType: 'application/json; charset=utf-8',
+      headers: { 'x-access-token': tokens },
+      dataType: "json",
+      crossDomain: true,
+      data: JSON.stringify({
+        'username': owner,
+  
+      }),
+success: function (data) {
+      console.log("comments")
+      console.log(data)
+      var logs = "";
+      logs = []
+      for (var i = 0; i < data.comments.length; i++) {
+        logs += '<div class="row no-gap">';
+        logs += '<img src="#" class="comment-image">';
+        logs += '<div class="col-75">';
+        logs += '<div class="title">';
+        logs += '<a href="#">'
+        logs += '<b>'+ data.comments[i].user_fname + ' ' + data.comments[i].user_lname+'</b>';
+        logs += '</a>';
+        logs += '</div>';
+        logs += '<div class="comment-box" style="padding: 2%;">';
+        logs += data.comments[i].comment ;
+        logs += '</div></div></div>';
+        logs += '<hr>';
+      }
+        $("#comments").append(logs);
+      },
+      error: function (data) {
+        console.log(data);
+      },
+      complete: function(data){
+        app.dialog.close();
+      }
+    });
+  }
+
 function markread() {
   var tokens = localStorage.getItem('token');
   var user = localStorage.getItem('username');
@@ -1915,6 +2514,160 @@ function notif(){
   }
 });
 }
+
+
+function borrow_return(){
+  var tokens = localStorage.getItem('token');
+  var user = localStorage.getItem('username');
+  var borrower = localStorage.getItem('borrower');
+  var id = localStorage.getItem('bookid');
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/borrow_return',
+    contentType: 'application/json; charset=utf-8',
+    method: "POST",
+    dataType: "json",
+    crossDomain: true,
+    headers: { 'x-access-token': tokens },
+    data:JSON.stringify({
+      'book_id': id,
+      'borrower': borrower,
+      'owner': user
+    }),
+    success: function (data) {
+      console.log(data)
+    }, error: function (data) {
+      console.log(data);
+      console.log("gdgagsd");
+    }
+  });
+}
+function borrow_return_request() {
+  var tokens = localStorage.getItem('token');
+  var user = localStorage.getItem('username');
+  var borrower = localStorage.getItem('bookowners');
+  var id = localStorage.getItem('bookid');
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/borrow_return_request',
+    contentType: 'application/json; charset=utf-8',
+    method: "POST",
+    dataType: "json",
+    crossDomain: true,
+    headers: { 'x-access-token': tokens },
+    data: JSON.stringify({
+      'book_id': id,
+      'borrower': user,
+      'owner': borrower
+    }),
+    success: function (data) {
+      console.log(data)
+    }, error: function (data) {
+      console.log(data);
+      console.log("gdgagsd");
+    }
+  });
+}
+function rent_return() {
+  var tokens = localStorage.getItem('token');
+  var user = localStorage.getItem('username');
+  var borrower = localStorage.getItem('borrower');
+  var id = localStorage.getItem('bookid');
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/rent_return',
+    contentType: 'application/json; charset=utf-8',
+    method: "POST",
+    dataType: "json",
+    crossDomain: true,
+    headers: { 'x-access-token': tokens },
+    data: JSON.stringify({
+      'book_id': id,
+      'borrower': borrower,
+      'owner': user
+    }),
+    success: function (data) {
+      console.log(data);
+    },error:function(data) {
+      console.log(data);   
+      console.log("gdgagsd");   
+    }
+  });
+}
+
+function promptTest() {
+  app.dialog.prompt('<h5>'+'Step-by-step procedure:'+'</h5>'+
+  '<ol><h5><li>'+'Make contact with the owner of the book to discuss where to meet and when.'+'</li></h5>'+
+  '<h5><li>'+'Meet up with them'+'</li></h5>'+
+  '<h5><li>'+'When you receive the book, make sure they have given the verification code.'+'</h5></li>'+
+  '<h5 style="font-weight:bolder;"><li>'+'Enter the code given to you from the owner.'+'</li></h5></ol>', '<h4>' +'Enter the verification code given by the owner of the book:'+'</h4>', function (code) {
+    var tokens = localStorage.getItem('token');
+    var id = localStorage.getItem('bookid');
+    var owner = localStorage.getItem('bookowners');
+    var user = localStorage.getItem('username');
+
+    loops = [];
+
+    app.request({
+      url: 'https://desolate-basin-69053.herokuapp.com/bookshelf/confirm',
+      method: "POST",
+      contentType: 'application/json; charset=utf-8',
+      headers: { 'x-access-token': tokens },
+      dataType: "json",
+      crossDomain: true,
+      data: JSON.stringify({
+        'book_id': id,
+        'book_borrower': user,
+        'book_owner': owner,
+        'code': code
+
+      }),
+      success: function (data) {
+        console.log(data);
+        if (data.message == "Code invalid" ){
+          app.dialog.alert('Code is invalid', "INVALID");
+        }else{
+          app.dialog.alert('Confirmed', "SUCCESS");
+          mainView.router.navigate(mainView.router.currentRoute.url,{
+            ignoreCache: true,
+            reloadCurrent: true
+          });
+        }
+      },
+      error: function (data) {
+        console.log(data);
+        console.log("error");
+      }
+    });
+  });
+}
+
+function visitviewbooks() {
+  var tokens = localStorage.getItem('token');
+  var username = localStorage.getItem('bookowners');
+  loops = [];
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/user/bookshelf',
+    method: "POST",
+    contentType: 'application/json; charset=utf-8',
+    headers: { 'x-access-token': tokens },
+    dataType: "json",
+    crossDomain: true,
+    data: JSON.stringify({
+      'current_user': username
+    }),
+    success: function (data) {
+      console.log(data);
+      var employee_data = "";
+      for (var i = 0; i < data.book.length; i++) {
+        employee_data += '<div class="col-33" style="text-align:center;">';
+        employee_data += '<a href="/item/" onclick="getownerid(\'' + data.book[i].owner_bookshelfid + '\');bookowner(\'' + data.book[i].owner_username + '\');bookindex(\'' + data.book[i].book_id + '\');">' + '<img src="' + data.book[i].book_cover + '" width="100" height="100">' + '</a>';
+        employee_data += '<div class="container">' + data.book[i].title + '</div>';
+        employee_data += '</div>';
+      }
+      $('#allbook').append(employee_data);
+    }
+  });
+}
+
+
 function acceptreq() {
   var tokens = localStorage.getItem('token');
   var id = localStorage.getItem('bookid');
@@ -1986,5 +2739,40 @@ function rejectreq() {
     }
   });
 } 
-app.init()
 
+// Jerald code
+function myprofilecomments(){
+  console.log('myprofilecomments')
+  var username = localStorage.getItem('username');
+  var tokens = localStorage.getItem('token');
+  loops = [];
+  app.request({
+    url: 'https://desolate-basin-69053.herokuapp.com/user/comments',
+    type: "POST",
+    contentType: 'application/json; charset=utf-8',
+    dataType: "json",
+    headers: { 'x-access-token': tokens },
+    data: JSON.stringify({
+      "username": username
+    }),
+    success: function (data) {
+      console.log("comments")
+      var log = "";
+      logs = []
+      for (var i = 0; i < data.comments.length; i++) {
+      log += '<div class="row no-gap">';
+      log += '<div class="col-75">';
+      log += '<div class="title"><a href="#"><b>';
+      log += data.comments[i].user_fname + ' ' + data.comments[i]. user_lname + '</b></a>';
+      log += '</div>';
+      log += '<div class="comment-box" style="padding: 2%;">' + data.comments[i].comment + '</div>';
+      log += '</div></div><hr>';
+      }
+      $('#myprofilecomments').append(log);
+    },
+    error: function (data) {
+    }
+  });
+}
+
+app.init();
